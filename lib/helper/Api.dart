@@ -21,8 +21,8 @@ class Api {
 
   }
 
-  Future<List<Person>> contatos(String codigoContato) async {
-    http.Response response = await http.get(BASE_URL+'contatos/'+codigoContato,headers: {'token': token, 'Content-Type': 'application/json'});
+  Future<List<Person>> contatos() async {
+    http.Response response = await http.get(BASE_URL+'contatos/',headers: {'token': token, 'Content-Type': 'application/json'});
     if (response.statusCode == 200) {
       List<Person> pessoas =json.decode(response.body).map<Person>((map) {
         return Person.fromMap(map);
@@ -44,7 +44,7 @@ class Api {
 
   Future<bool> deletarContato(String codigoContato) async {
     http.Response response = await http.delete(BASE_URL + "contatos/" + codigoContato,headers: {'token': token, 'Content-Type': 'application/json'});
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200) {
       return true;
     } else {
       return false;
