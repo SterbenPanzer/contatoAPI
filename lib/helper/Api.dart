@@ -9,7 +9,6 @@ class Api {
   String token;
   Api(this.token);
 
-
   Future<Login> login(String email, String senha) async {
    http.Response response = await http.post( BASE_URL + "login", body: jsonEncode({"senha": senha,"email": email}),
         headers: {'token': token, 'Content-Type': 'application/json'});
@@ -44,8 +43,7 @@ class Api {
   }
 
   Future<bool> deletarContato(String codigoContato) async {
-    http.Response response = await http.delete(BASE_URL + "contatos/delete/" + codigoContato,headers: {'token': token, 'Content-Type': 'application/json'});
-    print(response.toString());
+    http.Response response = await http.delete(BASE_URL + "contatos/" + codigoContato,headers: {'token': token, 'Content-Type': 'application/json'});
     if (response.statusCode == 200 || response.statusCode == 201) {
       return true;
     } else {
