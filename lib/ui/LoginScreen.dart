@@ -4,6 +4,7 @@ import 'home.dart';
 import '../utils/Dialogs.dart';
 import '../ui/Cadastro.dart';
 import 'package:flutter/services.dart';
+import'package:db_contatos_sqflite/helper/Api.dart';
 
 class LoginScreen extends StatefulWidget {
   final Login login;
@@ -14,6 +15,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+ Api api = new Api();
+
+ 
+  
   LoginHelper helper = LoginHelper();
   List<Login> login = List();
   Dialogs dialog = new Dialogs();
@@ -77,16 +82,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       textColor: Colors.white,
                       onPressed: () async {
                         if (_formLogin.currentState.validate()) {
-                          Login user = await helper.getLogin(_emailController.text,
+                          Login user = await api.login(_emailController.text,
+
                               _senhaController.text);
+
                           if (user !=
                               null) {
-                            helper.saveLogado(user.id);
+                            api.token = user.id.toString();
                             Navigator.pop(context);
                             await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => HomePage(user.id)));
+                                    builder: (context) => HomePage(user.id,user.token)));
                           } else {
                             dialog.showAlertDialog(
                                 context, 'Aviso', 'Login inválido');

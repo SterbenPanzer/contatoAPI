@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:sqflite/sqflite.dart';
 import '../utils/Strings.dart';
 import '../helper/Databases.dart';
+import 'dart:convert';
 
 
 class LoginHelper {
@@ -12,7 +13,7 @@ class LoginHelper {
   Databases databases = new Databases();
 
 
-  Future<bool> saveCadastro(String nome, String email, String senha) async {
+  /*Future<bool> saveCadastro(String nome, String email, String senha) async {
     Database dbLogin = await databases.db;
     Login login = new Login();
     login.nome = nome;
@@ -63,12 +64,14 @@ class LoginHelper {
     }
     return listLogin;
   }
+  */
 
-  Future<bool> saveLogado(int login_id) async {
+  Future<bool> saveLogado(String login_id, String token) async {
     Database dbLogado = await databases.db;
     Logado logado = new Logado();
     logado.id=1;
     logado.logado_login_id = login_id;
+    logado.token = token;
     if(await dbLogado.insert(logadoTable, logado.toMap())>0) {
       return true;
     }else{
@@ -76,14 +79,25 @@ class LoginHelper {
     }
   }
 
-  Future<int> getLogado() async{
+  Future<int> getLogadoid() async {
     Database dbLogado = await databases.db;
-    List<Map> maps =  await dbLogado.rawQuery("SELECT * FROM $logadoTable");
-    if(maps.length>0){
+    List<Map> maps = await dbLogado.rawQuery("SELECT * FROM $logadoTable");
+    if (maps.length > 0) {
       Logado usuariologado = Logado.fromMap(maps.first);
       return usuariologado.logado_login_id;
-    }else{
-      return 0;
+    } else {
+      return null;
+    }
+  }
+
+  Future<String> getLogado() async {
+    Database dbLogado = await databases.db;
+    List<Map> maps = await dbLogado.rawQuery("SELECT * FROM $logadoTable");
+    if (maps.length > 0) {
+      Logado usuariologado = Logado.fromMap(maps.first);
+      return usuariologado.token;
+    } else {
+      return null;
     }
   }
     Future<int> deleteLogado() async {
@@ -100,16 +114,19 @@ class LoginHelper {
 }
 
 class Logado {
-  int id;
-  int logado_login_id;
+  dynamic id;
+  String token;
+  dynamic logado_login_id;
   Logado();
   Logado.fromMap(Map map){
     id = map[idLogadoColumn];
     logado_login_id = map[login_idLogadoColumn];
+    token = map[tokenColumn];
   }
   Map toMap() {
     Map<String, dynamic> map = {
       idLoginColumn: id,
+      tokenColumn: token,
       login_idLogadoColumn: logado_login_id
     };
     return map;
@@ -118,32 +135,36 @@ class Logado {
 
 class Login {
   int id;
+  String token;
   String nome;
   String email;
   String senha;
   Login();
   Login.fromMap(Map map){
-    id = map[idLoginColumn];
+    id = int.parse(map[idLoginColumn]);
     email = map[emailLoginColumn];
     nome = map[nomeLoginColumn];
     senha = map[senhaLoginColumn];
+    token = map[tokenColumn];
   }
 
-  Map toMap() {
+  /* Map toMap() {
     Map<String, dynamic> map = {
       emailLoginColumn: email,
       nomeLoginColumn: nome,
-      senhaLoginColumn: senha
+      senhaLoginColumn: senha,
+      tokenColumn: token
     };
     if (id != null) {
       map[idLoginColumn] = id;
     }
     return map;
   }
+  */
 
   @override
   String toString() {
-    return "Login(id: $id, name: $nome, email: $email, senha: $senha)";
+    return "Login(id: $id, name: $nome, email: $email, senha: $senha, token: $token)";
   }
 
 }

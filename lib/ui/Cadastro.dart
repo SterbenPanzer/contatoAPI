@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../helper/login_helper.dart';
 import '../utils/Dialogs.dart';
+import 'package:db_contatos_sqflite/helper/Api.dart';
+import 'package:db_contatos_sqflite/ui/home.dart';
+
 
 class Cadastro extends StatefulWidget {
   @override
@@ -8,6 +11,8 @@ class Cadastro extends StatefulWidget {
 }
 
 class _CadastroState extends State<Cadastro> {
+  Api api = new Api();
+
   LoginHelper helper = LoginHelper();
   Dialogs dialog = new Dialogs();
   final _nomeController = TextEditingController();
@@ -74,10 +79,18 @@ class _CadastroState extends State<Cadastro> {
                         textColor: Colors.blueAccent,
                         onPressed: () async {
                           if (_formCadastro.currentState.validate()) {
-                            if(await helper.saveCadastro(_nomeController.text,
-                                _emailController.text, _senhaController.text)){
-                              Navigator.pop(context);
-                            }else {
+                            Login user = await api.saveCadastro(_nomeController.text,
+                                _emailController.text, _senhaController.text);
+
+                              if(user != null){
+                                api.saveCadastro(_emailController.text, _senhaController.text, _nomeController.text);
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => HomePage(user.email,user.token)));
+                              }else {
                               dialog.showAlertDialog(
                                   context, 'Aviso', 'Usuário não cadastrado');
                             }

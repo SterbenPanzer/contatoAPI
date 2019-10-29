@@ -10,7 +10,7 @@ class PersonHelper {
 
   Databases databases = new Databases();
 
-  Future<Person> savePerson(Person person,int login_id) async {
+  /*Future<Person> savePerson(Person person,int login_id) async {
     Person person2 = person;
     Person novaPerson = Person();
     novaPerson.login_id = login_id;
@@ -61,6 +61,7 @@ class PersonHelper {
     }
     return listPerson;
   }
+  */
 
   Future close() async {
     Database dbPerson = await databases.db;
@@ -70,36 +71,34 @@ class PersonHelper {
 }
 
 class Person {
-
-  int id;
+  dynamic id;
   String nome;
   String telefone;
-  int login_id;
+  dynamic usuario_id;
 
-  Person();
 
-  Person.fromMap(Map map){
-    id = map[idPersonColumn];
-    nome = map[nomePersonColumn];
-    telefone = map[telefonePersonColumn];
-    login_id = map[login_idPersonColumn];
+  Person({this.id, this.nome, this.telefone, this.usuario_id});
+
+  factory Person.fromJson(Map<String, dynamic> json) {
+    return Person(
+      id: json['id'],
+      nome: json['nome'],
+      telefone: json['telefone'],
+      usuario_id: json['usuario_id'],
+    );
   }
 
-  Map toMap() {
-    Map<String, dynamic> map = {
-      nomePersonColumn: nome,
-      telefonePersonColumn: telefone,
-      login_idPersonColumn: login_id
-    };
-    if(id != null){
-      map[idPersonColumn] = id;
-    }
-    return map;
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['nome'] = this.nome;
+    data['telefone'] = this.telefone;
+    return data;
   }
+
 
   @override
   String toString() {
-    return "Person(id: $id, name: $nome, telefone: $telefone)";
+    return "Person(id: $id, nome: $nome, telefone: $telefone, usuario_id: $usuario_id)";
   }
-
 }

@@ -6,11 +6,13 @@ import '../helper/pessoa_helper.dart';
 import '../helper/login_helper.dart';
 import '../utils/Dialogs.dart';
 import '../ui/LoginScreen.dart';
+import 'package:db_contatos_sqflite/helper/Api.dart';
 
 class HomePage extends StatefulWidget {
-  int login_id;
+  dynamic login_id;
+  String token;
 
-  HomePage(this.login_id);
+  HomePage(this.login_id, this.token);
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -22,10 +24,14 @@ class _HomePageState extends State<HomePage> {
   LoginHelper helperLog = LoginHelper();
   PersonHelper helper = PersonHelper();
   List<Person> person = List();
+  Api api = new Api();
+
+  var isLoading = false;
 
   @override
   void initState(){
     super.initState();
+    isLoading = true;
     _getAllPersons();
   }
 
@@ -66,13 +72,17 @@ class _HomePageState extends State<HomePage> {
         ),
 
         body:WillPopScope(
-            child: ListView.builder(
+            child: (isLoading)
+                ? Center(
+              child: CircularProgressIndicator(),
+            )
+                : ListView.builder(
                 padding: EdgeInsets.all(10.0),
                 itemCount: person.length,
                 itemBuilder: (context, index) {
                   return _personCard(context, index);
                 }),
-            onWillPop: (){
+            onWillPop: () {
               return null;
             })
     );
@@ -88,9 +98,9 @@ class _HomePageState extends State<HomePage> {
                 )));
     if (recContact != null) {
       if (person != null) {
-        await helper.updatePerson(recContact,widget.login_id);
+        await api.atualizarContato(recContact,widget.login_id, widget.token);
       } else {
-        await helper.savePerson(recContact,widget.login_id);
+        await api.cadastroPerson(recContact,widget.login_id, widget.token);
       }
       _getAllPersons();
     }
@@ -196,7 +206,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       onPressed: () {
-        helper.deletePerson(person[index].id);
+        api.deletarContato(person[index].id, widget.token);
         setState(() {
           person.removeAt(index);
           Navigator.pop(context);
@@ -207,8 +217,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _getAllPersons() async{
-    helper.getAllPersons(widget.login_id).then((list) {
+    api.contatos(widget.token).then((list) {
       setState(() {
+        isLoading = false;
         person = list;
       });
     });

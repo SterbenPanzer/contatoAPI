@@ -7,7 +7,8 @@ import 'helper/login_helper.dart';
 void main() async{
   LoginHelper helper = LoginHelper();
 
-  int logado = await helper.getLogado();
+  dynamic logado = await helper.getLogado();
+  dynamic login_id = await helper.getLogadoid();
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitDown,
@@ -16,7 +17,7 @@ void main() async{
 
   runApp(
       MaterialApp(
-      home: (logado>0)?HomePage(logado):LoginScreen(),
+      home: (logado != null)?HomePage(logado,login_id):LoginScreen(),
       debugShowCheckedModeBanner: false,
     ));
 
